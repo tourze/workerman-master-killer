@@ -1,0 +1,22 @@
+{
+  "name": "tourze/workerman-master-killer",
+  "description": "Kill Workerman master process, inspired by https://www.workerman.net/q/7958",
+  "license": "MIT",
+  "require": {
+    "php": "^8.1",
+    "workerman/workerman": "^5.1",
+    "psr/log": "^3|^2|^1"
+  },
+  "autoload": {
+    "psr-4": {
+      "Tourze\\Workerman\\MasterKillber\\": "src"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10.0",
+    "phpstan/phpstan": "^2.1"
+  },
+  "scripts": {
+    "phpstan": "phpstan analyse src -l 1"
+  }
+}
