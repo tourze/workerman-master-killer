@@ -11,12 +11,12 @@
   },
   "autoload": {
     "psr-4": {
-      "Tourze\\Workerman\\MasterKillber\\": "src"
+      "Tourze\\Workerman\\MasterKiller\\": "src"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Tourze\\Workerman\\MasterKillber\\Tests\\": "tests"
+      "Tourze\\Workerman\\MasterKiller\\Tests\\": "tests"
     }
   },
   "require-dev": {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tourze\Workerman\MasterKillber;
+namespace Tourze\Workerman\MasterKiller;
 
 use Psr\Log\LoggerInterface;
 use Workerman\Worker;
