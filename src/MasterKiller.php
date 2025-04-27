@@ -13,7 +13,7 @@ class MasterKiller
 
     /**
      * 杀死 Workerman 主进程
-     * 
+     *
      * 该方法不会返回，会直接调用 exit 退出
      */
     public function killMaster(): never
@@ -87,7 +87,7 @@ class MasterKiller
 
     /**
      * 退出程序
-     * 
+     *
      * 该方法不会返回
      */
     protected function exit(int $status = 0): never
