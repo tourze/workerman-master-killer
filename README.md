@@ -1,56 +1,74 @@
 # Workerman Master Killer
 
-Kill Workerman master process, inspired by [this Workerman forum post](https://www.workerman.net/q/7958).
+[![Packagist Version](https://img.shields.io/packagist/v/tourze/workerman-master-killer)](https://packagist.org/packages/tourze/workerman-master-killer)
+[![PHP Version](https://img.shields.io/packagist/php-v/tourze/workerman-master-killer)](https://packagist.org/packages/tourze/workerman-master-killer)
+[![License](https://img.shields.io/github/license/tourze/workerman-master-killer)](https://github.com/tourze/workerman-master-killer)
 
-## 安装
+A utility to safely kill the Workerman master process. Inspired by [this Workerman forum post](https://www.workerman.net/q/7958).
+
+---
+
+## Features
+
+- One-command safe termination of Workerman master process
+- Supports logging for troubleshooting
+- Compatible with Workerman 5.1+
+- Useful for force-stopping master process when it cannot exit normally
+
+## Requirements
+
+- PHP 8.1 or higher
+- ext-posix extension
+- ext-pcntl extension
+- Workerman 5.1 or higher
+- PSR-3 compatible logger
+
+## Installation
+
+Install via Composer:
 
 ```bash
 composer require tourze/workerman-master-killer
 ```
 
-## 要求
-
-- PHP 8.1 或更高版本
-- ext-posix 扩展
-- ext-pcntl 扩展
-- Workerman 5.1 或更高版本
-- PSR-3 日志实现
-
-## 使用
+## Quick Start
 
 ```php
-<?php
-
 use Psr\Log\LoggerInterface;
 use Tourze\Workerman\MasterKiller\MasterKiller;
 use Workerman\Worker;
 
-// 设置 PID 文件路径
 Worker::$pidFile = '/path/to/workerman.pid';
-
-// 创建日志记录器
 $logger = new YourLoggerImplementation();
-
-// 创建 MasterKiller 实例
 $killer = new MasterKiller($logger);
-
-// 杀死 Workerman 主进程
-$killer->killMaster(); // 此方法不会返回，会调用 exit
-
-// 可以在信号处理器或其他需要强制停止 Workerman 的地方使用
+$killer->killMaster(); // This method never returns, will call exit
 ```
 
-## 工作原理
+You can use this in a signal handler or anywhere you need to force stop Workerman.
 
-`MasterKiller` 类提供了一个 `killMaster` 方法，它会：
+## How It Works
 
-1. 读取 `Worker::$pidFile` 获取主进程 PID
-2. 向主进程发送 `SIGQUIT` 信号
-3. 等待主进程退出，最长等待 5 秒
-4. 记录结果并结束程序
+- Reads the master process PID from `Worker::$pidFile`
+- Sends SIGQUIT signal to the master process
+- Waits up to 5 seconds for the process to exit
+- Logs the result
+- If timeout, forcibly exits the program
 
-这对于在某些 Workerman 进程无法正常退出的情况下强制停止非常有用。
+## Documentation
 
-## 协议
+- See source code comments for API details
+- Custom logger implementations supported (must implement PSR-3)
+
+## Contributing
+
+- Issues and PRs are welcome
+- Please follow PSR code style
+- Tests should cover main features
+
+## License
 
 MIT License
+
+## Changelog
+
+See [CHANGELOG.md] if available.
