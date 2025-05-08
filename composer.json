@@ -4,10 +4,15 @@
   "license": "MIT",
   "require": {
     "php": "^8.1",
-    "ext-posix": "*",
     "ext-pcntl": "*",
-    "workerman/workerman": "^5.1",
-    "psr/log": "^3|^2|^1"
+    "ext-posix": "*",
+    "psr/log": "^3|^2|^1",
+    "workerman/workerman": "^5.1"
+  },
+  "require-dev": {
+    "maglnet/composer-require-checker": "^4",
+    "phpstan/phpstan": "^2.1",
+    "phpunit/phpunit": "^10.0"
   },
   "autoload": {
     "psr-4": {
@@ -18,10 +23,5 @@
     "psr-4": {
       "Tourze\\Workerman\\MasterKiller\\Tests\\": "tests"
     }
-  },
-  "require-dev": {
-    "phpstan/phpstan": "^2.1",
-    "phpunit/phpunit": "^10.0",
-    "maglnet/composer-require-checker": "^4"
   }
 }
