@@ -36,7 +36,6 @@ class MasterKillerTest extends TestCase
     public function testKillMaster_WhenProcessExitsSuccessfully()
     {
         // 创建 Logger Mock
-        /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger */
         $logger = $this->createMock(LoggerInterface::class);
 
         // 设置预期的日志调用
@@ -83,7 +82,6 @@ class MasterKillerTest extends TestCase
     public function testKillMaster_WhenProcessTimeout()
     {
         // 创建 Logger Mock
-        /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger */
         $logger = $this->createMock(LoggerInterface::class);
 
         // 设置预期的日志调用
@@ -120,7 +118,6 @@ class MasterKillerTest extends TestCase
     public function testKillMaster_WhenPidFileNotExists()
     {
         // 创建 Logger Mock
-        /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger */
         $logger = $this->createMock(LoggerInterface::class);
 
         // 设置预期的日志调用
