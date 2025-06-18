@@ -21,14 +21,16 @@ class MasterKiller
         $master_pid = $this->isFile(Worker::$pidFile) ? (int)$this->fileGetContents(Worker::$pidFile) : 0;
         $sig = \SIGQUIT;
         // Send stop signal to master process.
-        $master_pid && $this->posixKill($master_pid, $sig);
+        if ($master_pid > 0) {
+            $this->posixKill($master_pid, $sig);
+        }
         $this->logger->warning("Workerman[$master_pid] stop fail");
         // Timeout.
         $timeout = 5;
         $start_time = $this->time();
         // Check master process is still alive?
-        while (1) {
-            $master_is_alive = $master_pid && $this->posixKill((int)$master_pid, 0);
+        while (true) {
+            $master_is_alive = $master_pid > 0 && $this->posixKill((int)$master_pid, 0);
             if ($master_is_alive) {
                 // Timeout?
                 if ($this->time() - $start_time >= $timeout) {
