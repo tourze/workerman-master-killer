@@ -5,6 +5,7 @@ namespace Tourze\Workerman\MasterKiller\Tests;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Tourze\Workerman\MasterKiller\Exception\TestExitException;
 use Workerman\Worker;
 
 class MasterKillerTest extends TestCase
@@ -55,8 +56,8 @@ class MasterKillerTest extends TestCase
         // 执行测试方法并捕获预期异常
         try {
             $killer->killMasterWithoutExit();
-            $this->fail('Expected RuntimeException was not thrown');
-        } catch (RuntimeException $e) {
+            $this->fail('Expected TestExitException was not thrown');
+        } catch (TestExitException $e) {
             $this->assertStringContainsString('Exit called with code: 0', $e->getMessage());
         }
 
@@ -100,8 +101,8 @@ class MasterKillerTest extends TestCase
         // 执行测试方法并捕获预期异常
         try {
             $killer->killMasterWithoutExit();
-            $this->fail('Expected RuntimeException was not thrown');
-        } catch (RuntimeException $e) {
+            $this->fail('Expected TestExitException was not thrown');
+        } catch (TestExitException $e) {
             $this->assertStringContainsString('Exit called with code: 0', $e->getMessage());
         }
 
@@ -141,8 +142,8 @@ class MasterKillerTest extends TestCase
         // 执行测试方法并捕获预期异常
         try {
             $killer->killMasterWithoutExit();
-            $this->fail('Expected RuntimeException was not thrown');
-        } catch (RuntimeException $e) {
+            $this->fail('Expected TestExitException was not thrown');
+        } catch (TestExitException $e) {
             $this->assertStringContainsString('Exit called with code: 0', $e->getMessage());
         }
 

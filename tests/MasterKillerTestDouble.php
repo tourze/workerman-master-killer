@@ -3,6 +3,7 @@
 namespace Tourze\Workerman\MasterKiller\Tests;
 
 use RuntimeException;
+use Tourze\Workerman\MasterKiller\Exception\TestExitException;
 use Tourze\Workerman\MasterKiller\MasterKiller;
 
 /**
@@ -124,7 +125,7 @@ class MasterKillerTestDouble extends MasterKiller
     {
         $this->exitCalled = true;
         $this->exitCode = $status;
-        throw new RuntimeException("Exit called with code: $status");
+        throw new TestExitException($status);
     }
 
     /**
@@ -136,7 +137,7 @@ class MasterKillerTestDouble extends MasterKiller
     {
         try {
             $this->killMaster();
-        } catch (RuntimeException $e) {
+        } catch (TestExitException $e) {
             // 不捕获异常，让它传播到测试方法
             throw $e;
         }
