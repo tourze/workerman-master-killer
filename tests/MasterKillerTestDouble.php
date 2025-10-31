@@ -2,7 +2,6 @@
 
 namespace Tourze\Workerman\MasterKiller\Tests;
 
-use RuntimeException;
 use Tourze\Workerman\MasterKiller\Exception\TestExitException;
 use Tourze\Workerman\MasterKiller\MasterKiller;
 
@@ -28,14 +27,14 @@ class MasterKillerTestDouble extends MasterKiller
     /**
      * 记录 posix_kill 调用情况
      *
-     * @var array
+     * @var array<array{pid: int, signal: int}>
      */
     public $posixKillCalls = [];
 
     /**
      * posix_kill 函数返回值队列
      *
-     * @var array
+     * @var array<bool>
      */
     public $posixKillReturns = [];
 
@@ -65,7 +64,7 @@ class MasterKillerTestDouble extends MasterKiller
      *
      * @var int|null
      */
-    public $exitCode = null;
+    public $exitCode;
 
     /**
      * 重写 is_file 函数
@@ -93,7 +92,7 @@ class MasterKillerTestDouble extends MasterKiller
             'signal' => $signal,
         ];
 
-        if (!empty($this->posixKillReturns)) {
+        if ([] !== $this->posixKillReturns) {
             return array_shift($this->posixKillReturns);
         }
 
@@ -107,6 +106,7 @@ class MasterKillerTestDouble extends MasterKiller
     {
         $time = $this->currentTime;
         $this->currentTime += $this->timeIncrement;
+
         return $time;
     }
 

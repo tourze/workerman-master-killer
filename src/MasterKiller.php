@@ -3,9 +3,10 @@
 namespace Tourze\Workerman\MasterKiller;
 
 use Psr\Log\LoggerInterface;
+use Tourze\Workerman\MasterKiller\Exception\FileReadException;
 use Workerman\Worker;
 
-class MasterKiller
+abstract class MasterKiller
 {
     public function __construct(private readonly LoggerInterface $logger)
     {
@@ -18,33 +19,76 @@ class MasterKiller
      */
     public function killMaster(): never
     {
-        $master_pid = $this->isFile(Worker::$pidFile) ? (int)$this->fileGetContents(Worker::$pidFile) : 0;
-        $sig = \SIGQUIT;
-        // Send stop signal to master process.
+        $master_pid = $this->getMasterPid();
+        $this->sendStopSignal($master_pid);
+        $this->waitForProcessStop($master_pid);
+    }
+
+    /**
+     * 获取主进程 PID
+     */
+    private function getMasterPid(): int
+    {
+        return $this->isFile(Worker::$pidFile) ? (int) $this->fileGetContents(Worker::$pidFile) : 0;
+    }
+
+    /**
+     * 发送停止信号
+     */
+    private function sendStopSignal(int $master_pid): void
+    {
         if ($master_pid > 0) {
-            $this->posixKill($master_pid, $sig);
+            $this->posixKill($master_pid, \SIGQUIT);
         }
-        $this->logger->warning("Workerman[$master_pid] stop fail");
-        // Timeout.
+        $this->logger->warning("Workerman[{$master_pid}] stop fail");
+    }
+
+    /**
+     * 等待进程停止
+     */
+    private function waitForProcessStop(int $master_pid): never
+    {
         $timeout = 5;
         $start_time = $this->time();
-        // Check master process is still alive?
+
         while (true) {
-            $master_is_alive = $master_pid > 0 && $this->posixKill((int)$master_pid, 0);
-            if ($master_is_alive) {
-                // Timeout?
-                if ($this->time() - $start_time >= $timeout) {
-                    $this->logger->warning("Workerman stop fail");
-                    $this->exit();
-                }
-                // Waiting amoment.
-                $this->usleep(10000);
+            if ($this->isMasterProcessAlive($master_pid)) {
+                $this->handleProcessStillAlive($start_time, $timeout);
                 continue;
             }
-            // Stop success.
-            $this->logger->info("Workerman stop success");
-            $this->exit(0);
+
+            $this->handleProcessStopped();
         }
+    }
+
+    /**
+     * 检查主进程是否存活
+     */
+    private function isMasterProcessAlive(int $master_pid): bool
+    {
+        return $master_pid > 0 && $this->posixKill($master_pid, 0);
+    }
+
+    /**
+     * 处理进程仍然存活的情况
+     */
+    private function handleProcessStillAlive(int $start_time, int $timeout): void
+    {
+        if ($this->time() - $start_time >= $timeout) {
+            $this->logger->warning('Workerman stop fail');
+            $this->exit();
+        }
+
+        $this->usleep(10000);
+    }
+
+    /**
+     * 处理进程已停止的情况
+     */
+    private function handleProcessStopped(): never
+    {
+        $this->logger->info('Workerman stop success');
+        $this->exit(0);
     }
 
     /**
@@ -60,7 +104,12 @@ class MasterKiller
      */
     protected function fileGetContents(string $filename): string
     {
-        return \file_get_contents($filename);
+        $content = \file_get_contents($filename);
+        if (false === $content) {
+            throw new FileReadException("Failed to read file: {$filename}");
+        }
+
+        return $content;
     }
 
     /**

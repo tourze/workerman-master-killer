@@ -2,29 +2,29 @@
 
 namespace Tourze\Workerman\MasterKiller\Tests;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
+use Tourze\Workerman\MasterKiller\DefaultMasterKiller;
 use Tourze\Workerman\MasterKiller\Exception\TestExitException;
 use Workerman\Worker;
 
-class MasterKillerTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(DefaultMasterKiller::class)]
+final class DefaultMasterKillerTest extends TestCase
 {
-    private ?string $originalPidFile = null;
+    private string $originalPidFile;
 
-    /**
-     * 备份和设置测试环境
-     */
     protected function setUp(): void
     {
         parent::setUp();
+
         $this->originalPidFile = Worker::$pidFile;
         Worker::$pidFile = '/tmp/workerman.pid';
     }
 
-    /**
-     * 恢复测试环境
-     */
     protected function tearDown(): void
     {
         Worker::$pidFile = $this->originalPidFile;
@@ -34,18 +34,20 @@ class MasterKillerTest extends TestCase
     /**
      * 测试杀死主进程成功的情况
      */
-    public function testKillMaster_WhenProcessExitsSuccessfully()
+    public function testKillMasterWhenProcessExitsSuccessfully(): void
     {
         // 创建 Logger Mock
         $logger = $this->createMock(LoggerInterface::class);
 
         // 设置预期的日志调用
         $logger->expects($this->atLeastOnce())
-            ->method('warning');
+            ->method('warning')
+        ;
 
         $logger->expects($this->once())
             ->method('info')
-            ->with('Workerman stop success');
+            ->with('Workerman stop success')
+        ;
 
         // 创建测试代理类
         $killer = new MasterKillerTestDouble($logger);
@@ -56,7 +58,7 @@ class MasterKillerTest extends TestCase
         // 执行测试方法并捕获预期异常
         try {
             $killer->killMasterWithoutExit();
-            $this->fail('Expected TestExitException was not thrown');
+            self::fail('Expected TestExitException was not thrown');
         } catch (TestExitException $e) {
             $this->assertStringContainsString('Exit called with code: 0', $e->getMessage());
         }
@@ -80,16 +82,17 @@ class MasterKillerTest extends TestCase
     /**
      * 测试杀死主进程超时的情况
      */
-    public function testKillMaster_WhenProcessTimeout()
+    public function testKillMasterWhenProcessTimeout(): void
     {
         // 创建 Logger Mock
         $logger = $this->createMock(LoggerInterface::class);
 
         // 设置预期的日志调用
         $logger->expects($this->atLeastOnce())
-            ->method('warning');
+            ->method('warning')
+        ;
 
-        // 创建测试代理类  
+        // 创建测试代理类
         $killer = new MasterKillerTestDouble($logger);
 
         // 设置 posix_kill 始终返回 true（表示进程仍然活着）
@@ -101,7 +104,7 @@ class MasterKillerTest extends TestCase
         // 执行测试方法并捕获预期异常
         try {
             $killer->killMasterWithoutExit();
-            $this->fail('Expected TestExitException was not thrown');
+            self::fail('Expected TestExitException was not thrown');
         } catch (TestExitException $e) {
             $this->assertStringContainsString('Exit called with code: 0', $e->getMessage());
         }
@@ -116,7 +119,7 @@ class MasterKillerTest extends TestCase
     /**
      * 测试 PID 文件不存在的情况
      */
-    public function testKillMaster_WhenPidFileNotExists()
+    public function testKillMasterWhenPidFileNotExists(): void
     {
         // 创建 Logger Mock
         $logger = $this->createMock(LoggerInterface::class);
@@ -124,11 +127,13 @@ class MasterKillerTest extends TestCase
         // 设置预期的日志调用
         $logger->expects($this->once())
             ->method('warning')
-            ->with('Workerman[0] stop fail');
+            ->with('Workerman[0] stop fail')
+        ;
 
         $logger->expects($this->once())
             ->method('info')
-            ->with('Workerman stop success');
+            ->with('Workerman stop success')
+        ;
 
         // 创建测试代理类
         $killer = new MasterKillerTestDouble($logger);
@@ -142,7 +147,7 @@ class MasterKillerTest extends TestCase
         // 执行测试方法并捕获预期异常
         try {
             $killer->killMasterWithoutExit();
-            $this->fail('Expected TestExitException was not thrown');
+            self::fail('Expected TestExitException was not thrown');
         } catch (TestExitException $e) {
             $this->assertStringContainsString('Exit called with code: 0', $e->getMessage());
         }
@@ -152,7 +157,7 @@ class MasterKillerTest extends TestCase
 
         // 当 PID 为 0 时，posix_kill 可能不会被调用，但我们仍需检查
         // 如果有调用，那么应该使用正确的参数
-        if (!empty($killer->posixKillCalls)) {
+        if ([] !== $killer->posixKillCalls) {
             $this->assertEquals(0, $killer->posixKillCalls[0]['signal']);
         }
     }
